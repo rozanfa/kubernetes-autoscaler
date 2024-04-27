@@ -1,0 +1,223 @@
+{
+    "containers": {
+        "compose-post-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "home-timeline-redis": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "home-timeline-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "jaeger": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "media-frontend": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "media-memcached": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "media-mongodb": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "media-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "nginx-thrift": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "post-storage-memcached": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "post-storage-mongodb": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "post-storage-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "social-graph-mongodb": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "social-graph-redis": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "social-graph-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "text-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "unique-id-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "url-shorten-memcached": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "url-shorten-mongodb": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "url-shorten-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "user-memcached": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "user-mention-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "user-mongodb": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "user-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "user-timeline-mongodb": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "user-timeline-redis": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        },
+        "user-timeline-service": {
+            "resources_target": {
+                "cpu": 500,
+                "memory": 500000000
+            },
+            "min_replicas": 1,
+            "max_replicas": 5
+        }
+    },
+    "namespace": "social-network",
+    "n_steps": 60,
+    "periode": 10
+}
