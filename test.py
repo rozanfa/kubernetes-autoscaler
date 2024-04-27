@@ -6,15 +6,17 @@ from src.classes.LoggingPool import LoggingPool
 from src.classes.Predictor import Predictor
 from src.lib.config_reader import config
 from src.classes.DB import DB
-import sched, time
+import logging
 import joblib
+import sched
+import time
 
-
-def main_loop(scheduler: sched.scheduler, node_names: list[str], collector: DataCollector, predictor: Predictor, periode: int):
-    scheduler.enter(periode, 1, main_loop, (scheduler, node_names, collector, predictor, periode))
+def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: Predictor, periode: int):
+    scheduler.enter(periode, 1, main_loop, (scheduler, collector, predictor, periode))
 
     collector.collect_data()
-    # predictor.predict()
+    res = predictor.predict()
+    print(res)
 
 
 def main():
@@ -33,16 +35,12 @@ def main():
     scheduler = sched.scheduler(time.time, time.sleep)
     periode = config.get("periode", 10)
     try :
-        scheduler.enter(0, 1, main_loop, (scheduler,  node_names, collector, predictor, periode))
+        scheduler.enter(0, 1, main_loop, (scheduler, collector, predictor, periode))
         print("Starting scheduler")
         scheduler.run()
     except KeyboardInterrupt:
-        print("Stopping scheduler")
-    finally:
-        pool.close()
-        pool.join()
-
-    db.close()
+        logging.info("Shutting down...")
+        db.close()
 
 
 if __name__ == "__main__":

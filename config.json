@@ -218,6 +218,6 @@
         }
     },
     "namespace": "social-network",
-    "n_steps": 60,
+    "n_steps": 90,
     "periode": 10
 }
