@@ -4,6 +4,7 @@ from kubernetes import config as kubernetes_config, client as kubernetes_client
 from src.classes.DataCollector import DataCollector
 from src.classes.LoggingPool import LoggingPool
 from src.classes.Predictor import Predictor
+from src.classes.Scaler import Scaler
 from src.lib.config_reader import config
 from src.classes.DB import DB
 import logging
@@ -17,12 +18,13 @@ def get_node_names() -> list[str]:
     node_names = [node.metadata.name for node in ret.items]
     return node_names
 
-def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: Predictor, periode: int):
-    scheduler.enter(periode, 1, main_loop, (scheduler, collector, predictor, periode))
+def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: Predictor, scaler: Scaler, periode: int):
+    scheduler.enter(periode, 1, main_loop, (scheduler, collector, predictor, scaler, periode))
 
     collector.collect_data()
     res = predictor.predict()
     print(res)
+    scaler.calculate_and_scale(res)
 
 def main():
     kubernetes_config.load_kube_config()
@@ -33,14 +35,16 @@ def main():
     collector = DataCollector(node_names, db)
 
     model = load_model("models/autoscaler_1_60.keras")
-    scaler = joblib.load("models/scaler.pkl")
-    predictor = Predictor(["minikube"], model, scaler, db)
+    minMaxScaler = joblib.load("models/min_max_scaler.pkl")
+    predictor = Predictor(["minikube"], model, minMaxScaler, db)
+
+    scaler = Scaler()
 
     pool = LoggingPool()
     scheduler = sched.scheduler(time.time, time.sleep)
     periode = config.get("periode", 10)
     try :
-        scheduler.enter(0, 1, main_loop, (scheduler, collector, predictor, periode))
+        scheduler.enter(0, 1, main_loop, (scheduler, collector, predictor, scaler, periode))
         print("Starting scheduler")
         scheduler.run()
     except KeyboardInterrupt:
