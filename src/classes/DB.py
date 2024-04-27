@@ -81,7 +81,7 @@ class DB:
         table = self.__adapt_name(config["namespace"])
         cur = self.__conn.cursor()
         if limit is not None:
-            cur.execute(f"SELECT * FROM {table} LIMIT {limit}")
+            cur.execute(f"SELECT * FROM {table} ORDER BY timestamp DESC LIMIT {limit}")
         else:
             cur.execute(f"SELECT * FROM {table}")
         data = cur.fetchall()
