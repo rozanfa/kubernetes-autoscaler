@@ -4,7 +4,7 @@ from src.classes.DB import connect, get_data
 import pandas as pd
 import numpy as np
 from src.lib.query import query_all_nodes
-from kubernetes import config as kubernetes_config
+from kubernetes import config as kubernetes_config, client as kubernetes_client
 from src.lib.config_reader import config
 import joblib
 from src.classes.DB import DB
@@ -13,13 +13,20 @@ from src.classes.DB import DB
 N_STEP = 60
 scaler = joblib.load("models/scaler.pkl")
 
+def get_node_names() -> list[str]:
+    v1 = kubernetes_client.CoreV1Api()
+    ret = v1.list_node()
+    node_names = [node.metadata.name for node in ret.items]
+    return node_names
+
 def preprocess_data(raw_data):
     training_set_scaled = scaler.inverse_transform(raw_data)
     return training_set_scaled
 
 def predict(model, sequence_data):
     kubernetes_config.load_kube_config()
-    raw_new_data, colnames, error_count = query_all_nodes(["minikube"])
+    node_names = get_node_names()
+    raw_new_data, colnames, error_count = query_all_nodes(node_names)
     if error_count > 0:
         print(f"Error count: {error_count}")
 
