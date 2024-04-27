@@ -1,17 +1,16 @@
 from tensorflow.keras.models import load_model
-from sklearn.preprocessing import MinMaxScaler
-from src.classes.DB import connect, get_data
-import pandas as pd
-import numpy as np
 from src.lib.query import query_all_nodes
 from kubernetes import config as kubernetes_config, client as kubernetes_client
+from src.classes.DataCollector import DataCollector
+from src.classes.LoggingPool import LoggingPool
+from src.classes.Predictor import Predictor
+from src.classes.Scaler import Scaler
 from src.lib.config_reader import config
-import joblib
 from src.classes.DB import DB
-
-
-N_STEP = 60
-scaler = joblib.load("models/scaler.pkl")
+import logging
+import joblib
+import sched
+import time
 
 def get_node_names() -> list[str]:
     v1 = kubernetes_client.CoreV1Api()
@@ -19,36 +18,38 @@ def get_node_names() -> list[str]:
     node_names = [node.metadata.name for node in ret.items]
     return node_names
 
-def preprocess_data(raw_data):
-    training_set_scaled = scaler.inverse_transform(raw_data)
-    return training_set_scaled
+def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: Predictor, scaler: Scaler, periode: int):
+    scheduler.enter(periode, 1, main_loop, (scheduler, collector, predictor, scaler, periode))
 
-def predict(model, sequence_data):
-    kubernetes_config.load_kube_config()
-    node_names = get_node_names()
-    raw_new_data, colnames, error_count = query_all_nodes(node_names)
-    if error_count > 0:
-        print(f"Error count: {error_count}")
-
-    new_data = raw_new_data.to_numpy()
-    sequence_data.append(new_data)
-    if len(sequence_data) < N_STEP:
-        sequence_data = [sequence_data[0] for _ in range(N_STEP - len(sequence_data))] + sequence_data
-    elif len(sequence_data) > N_STEP:
-        sequence_data = sequence_data[-N_STEP:]
-        
-    sequence_data_to_predict = preprocess_data(np.array(sequence_data))
-    sequence_data_to_predict = sequence_data_to_predict.reshape(1, N_STEP, len(new_data))
-    prediction = model.predict(sequence_data_to_predict)
-    prediction = scaler.inverse_transform(prediction)
-    prediction = pd.DataFrame(prediction, columns=colnames)
-
+    collector.collect_data()
+    res = predictor.predict()
+    print(res)
+    scaler.calculate_and_scale(res)
 
 def main():
+    kubernetes_config.load_kube_config()
     db = DB()
     db.create_tables()
+    node_names = get_node_names()
 
-    model = load_model("models/model.h5")
+    collector = DataCollector(node_names, db)
+
+    model = load_model("models/autoscaler_1_60.keras")
+    minMaxScaler = joblib.load("models/min_max_scaler.pkl")
+    predictor = Predictor(["minikube"], model, minMaxScaler, db)
+
+    scaler = Scaler()
+
+    pool = LoggingPool()
+    scheduler = sched.scheduler(time.time, time.sleep)
+    periode = config.get("periode", 10)
+    try :
+        scheduler.enter(0, 1, main_loop, (scheduler, collector, predictor, scaler, periode))
+        print("Starting scheduler")
+        scheduler.run()
+    except KeyboardInterrupt:
+        logging.info("Shutting down...")
+        db.close()
 
 
 if __name__ == "__main__":
