@@ -13,7 +13,7 @@ def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataF
     node_data = {}
     error_count = 0
 
-    response = api_client.call_api(f"/api/v1/nodes/{node_name}/proxy/metrics/resource", "GET", response_type="str")
+    response = api_client.call_api(f"/api/v1/nodes/{node_name}/proxy/metrics/resource", "GET", auth_settings=["BearerToken"], response_type="str")
     data = str(response[0])
     rows = data.split("\n")
 
@@ -28,6 +28,10 @@ def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataF
         try:
             if row[0] == "scrape_error":
                 error_count = int(row[1])
+            elif row[0] == "resource_scrape_error":
+                continue
+            elif row[0][:28] == "container_start_time_seconds":
+                continue
             elif row[0][:4] == "node":
                 process_node(row, node_data, node_name)
             else:

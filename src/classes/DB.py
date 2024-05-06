@@ -17,7 +17,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 class DB:
     def __init__(self, conn: connection = None):
         if conn is not None:
-            self.conn = conn
+            self.__conn = conn
         else:
             self.__conn = self.__connect()
         
@@ -37,7 +37,7 @@ class DB:
         cur = self.__conn.cursor()
         table_commands = "\n".join(list(map(self.__to_table_creation_command, config["containers"].keys())))
 
-        command = f"""
+        create_actual_data_table_command = f"""
         CREATE TABLE IF NOT EXISTS {self.__adapt_name(config["namespace"])} (
             id SERIAL PRIMARY KEY,
             {table_commands}
@@ -45,7 +45,17 @@ class DB:
         );
         """
 
-        cur.execute(command)
+        cur.execute(create_actual_data_table_command)
+
+        create_predicted_data_table_command = f"""
+        CREATE TABLE IF NOT EXISTS {self.__adapt_name(config["namespace"])}_predicted (
+            id SERIAL PRIMARY KEY,
+            {table_commands}
+            timestamp BIGINT
+        );
+        """
+
+        cur.execute(create_predicted_data_table_command)
 
         cur.execute("""
             CREATE TABLE IF NOT EXISTS error_count (
@@ -59,10 +69,19 @@ class DB:
         self.__conn.commit()
         cur.close()
 
-    def insert_data(self, data: DataFrame, timestamp: float):
+    def insert_actual_data(self, data: DataFrame, timestamp: float):
         cur = self.__conn.cursor()
         command = f"""
         INSERT INTO {self.__adapt_name(config["namespace"])} ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
+        """
+        cur.execute(command)
+        self.__conn.commit()
+        cur.close()
+
+    def insert_predicted_data(self, data: DataFrame, timestamp: float):
+        cur = self.__conn.cursor()
+        command = f"""
+        INSERT INTO {self.__adapt_name(config["namespace"])}_predicted ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
         """
         cur.execute(command)
         self.__conn.commit()
@@ -92,7 +111,7 @@ class DB:
     def get_error_count_data(self, limit: int = None) -> Tuple[Tuple, List[str]]:
         cur = self.__conn.cursor()
         if limit is not None:
-            cur.execute(f"SELECT * FROM error_count LIMIT {limit}")
+            cur.execute(f"SELECT * FROM error_count ORDER BY timestamp DESC LIMIT {limit}")
         else:
             cur.execute("SELECT * FROM error_count")
         data = cur.fetchall()

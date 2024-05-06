@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  autosclaer-db:
+    container_name: autoscaler-db
+    image: postgres:16.2
+    environment:
+      - POSTGRES_USER=app_user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=app_db
+    volumes:
+      - autoscaler-db-store:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  autoscaler-db-store:

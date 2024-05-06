@@ -21,10 +21,12 @@ def get_node_names() -> list[str]:
 def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: Predictor, scaler: Scaler, periode: int):
     scheduler.enter(periode, 1, main_loop, (scheduler, collector, predictor, scaler, periode))
 
-    collector.collect_data()
-    res = predictor.predict()
-    print(res)
-    scaler.calculate_and_scale(res)
+    timestamp = time.time()
+    collector.collect_data(timestamp)
+    predicted_data = predictor.predict(timestamp)
+
+    if predicted_data is not None:
+        scaler.calculate_and_scale(predicted_data)
 
 def main():
     kubernetes_config.load_kube_config()
@@ -34,9 +36,9 @@ def main():
 
     collector = DataCollector(node_names, db)
 
-    model = load_model("models/autoscaler_1_60.keras")
-    minMaxScaler = joblib.load("models/min_max_scaler.pkl")
-    predictor = Predictor(["minikube"], model, minMaxScaler, db)
+    model = load_model("models/autoscaler_1_60_v2.keras")
+    minMaxScaler = joblib.load("models/min_max_scaler_v2.pkl")
+    predictor = Predictor(model, minMaxScaler, db)
 
     scaler = Scaler()
 
@@ -48,7 +50,7 @@ def main():
         print("Starting scheduler")
         scheduler.run()
     except KeyboardInterrupt:
-        logging.info("Shutting down...")
+        print("Shutting down...")
         db.close()
 
 

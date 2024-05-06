@@ -12,15 +12,15 @@ class DataCollector:
         self.api_client = client.ApiClient()
 
 
-    def collect_data(self):
+    def collect_data(self, timestamp: int) -> None:
         data, colnames, error_count = query_all_nodes(self.api_client, self.node_names)
         if error_count > 0:
             logging.error(f"Error count: {error_count}")
 
         df = data.to_frame(0).T
-        current_time = time.time()
-        self.db.insert_data(df, current_time)
-        self.db.insert_error_count_data(error_count, current_time)
+
+        self.db.insert_actual_data(df, timestamp)
+        self.db.insert_error_count_data(error_count, timestamp)
         print("Data collected")
 
     def close(self):
