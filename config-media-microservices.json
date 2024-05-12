@@ -1,0 +1,272 @@
+{
+    "containers": {
+        "cast-info-memcached": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "cast-info-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "cast-info-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "compose-review-memcached": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "compose-review-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "jaeger": {
+            "desired_metrics": {
+                "cpu": 100
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-id-memcached": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-id-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-id-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-info-memcached": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-info-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-info-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-review-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 200
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-review-redis": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "movie-review-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "nginx-web-server": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "page-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "plot-memcached": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "plot-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "plot-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "rating-redis": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "rating-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "review-storage-memcached": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "review-storage-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "review-storage-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "text-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "unique-id-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "user-memcached": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "user-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "user-review-mongodb": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 200
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "user-review-redis": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "user-review-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        },
+        "user-service": {
+            "desired_metrics": {
+                "cpu": 100,
+                "memory": 150
+            },
+            "min_replicas": 1,
+            "max_replicas": 10
+        }
+    },
+    "namespace": "media-microservices",
+    "n_steps": 45,
+    "periode": 10,
+    "model_path": "models/mm_model_3_45.keras",
+    "scaler_path": "models/mm-min_max_scaler.pkl"
+}

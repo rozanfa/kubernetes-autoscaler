@@ -1,5 +1,4 @@
 from tensorflow.keras.models import load_model
-from src.lib.query import query_all_nodes
 from kubernetes import config as kubernetes_config, client as kubernetes_client
 from src.classes.DataCollector import DataCollector
 from src.classes.LoggingPool import LoggingPool
@@ -7,7 +6,6 @@ from src.classes.Predictor import Predictor
 from src.classes.Scaler import Scaler
 from src.lib.config_reader import config
 from src.classes.DB import DB
-import logging
 import joblib
 import sched
 import time
@@ -24,6 +22,7 @@ def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: P
     timestamp = time.time()
     collector.collect_data(timestamp)
     predicted_data = predictor.predict(timestamp)
+    print("Predicted data:", predicted_data)
 
     if predicted_data is not None:
         scaler.calculate_and_scale(predicted_data)
@@ -36,13 +35,12 @@ def main():
 
     collector = DataCollector(node_names, db)
 
-    model = load_model("models/autoscaler_1_60_v2.keras")
-    minMaxScaler = joblib.load("models/min_max_scaler_v2.pkl")
+    model = load_model(config["model_path"])
+    minMaxScaler = joblib.load(config["scaler_path"])
     predictor = Predictor(model, minMaxScaler, db)
 
     scaler = Scaler()
 
-    pool = LoggingPool()
     scheduler = sched.scheduler(time.time, time.sleep)
     periode = config.get("periode", 10)
     try :

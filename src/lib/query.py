@@ -13,9 +13,13 @@ def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataF
     node_data = {}
     error_count = 0
 
-    response = api_client.call_api(f"/api/v1/nodes/{node_name}/proxy/metrics/resource", "GET", auth_settings=["BearerToken"], response_type="str")
-    data = str(response[0])
-    rows = data.split("\n")
+    try:
+        response = api_client.call_api(f"/api/v1/nodes/{node_name}/proxy/metrics/resource", "GET", auth_settings=["BearerToken"], response_type="str")
+        data = str(response[0])
+        rows = data.split("\n")
+    except Exception as e:
+        print(f"Error[{node_name}]: {e}")
+        return pd.DataFrame(), 1
 
     # Remove comments and empty lines
     rows = [row for row in rows if not row.startswith("#") and row.strip() != ""]
@@ -61,5 +65,5 @@ def query_all_nodes(api_client: client.ApiClient, node_names: list[str]) -> tupl
             colnames = transformed_container_data.columns
         result = pd.concat([result, transformed_container_data], ignore_index=True)
         error_count += new_error_count
-    result = result.sum()
+    result = result.mean()
     return result, colnames, error_count

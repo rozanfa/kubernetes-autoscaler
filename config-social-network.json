@@ -2,222 +2,223 @@
     "containers": {
         "compose-post-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "home-timeline-redis": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 200,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "home-timeline-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "jaeger": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "media-frontend": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "media-memcached": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "media-mongodb": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "media-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "nginx-thrift": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 200,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "post-storage-memcached": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 350
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "post-storage-mongodb": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 250,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "post-storage-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 350
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "social-graph-mongodb": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "social-graph-redis": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "social-graph-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "text-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "unique-id-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "url-shorten-memcached": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 350
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "url-shorten-mongodb": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "url-shorten-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "user-memcached": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "user-mention-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "user-mongodb": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "user-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "user-timeline-mongodb": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "user-timeline-redis": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 150,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         },
         "user-timeline-service": {
             "desired_metrics": {
-                "cpu": 100,
-                "memory": 200
+                "cpu": 175,
+                "memory": 300
             },
             "min_replicas": 1,
             "max_replicas": 5
         }
     },
     "namespace": "social-network",
-    "n_steps": 60,
-    "periode": 10
+    "n_steps": 45,
+    "periode": 10,
+    "model_path": "models/autoscaler_1_60_v2.keras",
+    "scaler_path": "models/min_max_scaler_v2.pkl"
 }
