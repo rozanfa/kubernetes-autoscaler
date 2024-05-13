@@ -33,6 +33,7 @@ class DataCollector:
             # Subtract only the cpu usage of the previous data from the current data
             cpu_cols = [col for col in df.columns if "_cpu" in col]
             df[cpu_cols] = (df[cpu_cols] - self.previous_previous_data[cpu_cols]) / (timestamp - self.previous_previous_timestamp)
+            df[cpu_cols] = df[cpu_cols].clip(lower=0)
 
             self.db.insert_actual_data(df, timestamp)
             self.db.insert_error_count_data(error_count, timestamp)
