@@ -15,11 +15,11 @@ def process_pod_or_container(row: list[str], pods: Dict[str, PodMetric], contain
     match raw_type:
         case "container_cpu_usage_seconds_total":
             try:
-                containers[pod].cpu = float(value) / 10
+                containers[pod].cpu = float(value) * 1000
                 containers[pod].cpu_timestamp = int(timestamp)
             except KeyError:
                 containers[pod] = ContainerMetric(namespace=namespace, pod=pod, container=container)
-                containers[pod].cpu = float(value) / 10
+                containers[pod].cpu = float(value) * 1000
                 containers[pod].cpu_timestamp = int(timestamp)
         case "container_memory_working_set_bytes":
             try:
@@ -39,11 +39,11 @@ def process_pod_or_container(row: list[str], pods: Dict[str, PodMetric], contain
                 pods[pod].memory_timestamp = int(timestamp)
         case "pod_cpu_usage_seconds_total":
             try:
-                pods[pod].cpu = float(value) / 10
+                pods[pod].cpu = float(value) * 1000
                 pods[pod].cpu_timestamp = int(timestamp)
             except KeyError:
                 pods[pod] = PodMetric(namespace=namespace, pod=pod)
-                pods[pod].cpu = float(value) / 10
+                pods[pod].cpu = float(value) * 1000
                 pods[pod].cpu_timestamp = int(timestamp)
 
 
@@ -76,7 +76,7 @@ def transform_data(containers: Dict[str, ContainerMetric]):
     data = data.loc[data["container"].isin(config["containers"].keys())]
     data["timestamp"] = int(time.time())
     data.drop(["pod", "namespace"], axis=1, inplace=True)
-    data = data.groupby("container").sum().reset_index()
+    data = data.groupby("container").mean().reset_index()
     data = data.pivot(index="timestamp", columns="container", values=['cpu', 'memory'])
     data.columns = [f'{col[1]}_{col[0]}' for col in data.columns]
     return data

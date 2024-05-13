@@ -3,9 +3,11 @@ from kubernetes.client.rest import ApiException
 from src.lib.config_reader import config
 import pandas as pd
 import math
+from src.classes.DB import DB
 
 class Scaler:
-    def __init__(self):
+    def __init__(self, db: DB):
+        self.db = db
         self.api_client = client.ApiClient()
         self.api_instance = client.AppsV1Api(self.api_client)
         self.containers = config["containers"]
@@ -14,12 +16,13 @@ class Scaler:
     def __adapt_name(self, name: str):
         return name.replace("-", "_")
 
-    def calculate_and_scale(self, prediction: pd.DataFrame):
+    def calculate_and_scale(self, prediction: pd.DataFrame, timestamp: float):
         current_deployment_data = self.api_instance.list_namespaced_deployment(self.namespace)
         current_replicas = {
             item.metadata.name: item.spec.replicas for item in current_deployment_data.items
         }
         print("Current replicas:", current_replicas)
+        self.db.insert_replica_count_data(current_replicas, timestamp)
 
         for container in self.containers:
             container_key = self.__adapt_name(container)

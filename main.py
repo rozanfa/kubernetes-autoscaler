@@ -25,7 +25,7 @@ def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: P
     print("Predicted data:", predicted_data)
 
     if predicted_data is not None:
-        scaler.calculate_and_scale(predicted_data)
+        scaler.calculate_and_scale(predicted_data, timestamp)
 
 def main():
     kubernetes_config.load_kube_config()
@@ -39,7 +39,7 @@ def main():
     minMaxScaler = joblib.load(config["scaler_path"])
     predictor = Predictor(model, minMaxScaler, db)
 
-    scaler = Scaler()
+    scaler = Scaler(db)
 
     scheduler = sched.scheduler(time.time, time.sleep)
     periode = config.get("periode", 10)
