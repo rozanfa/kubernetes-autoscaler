@@ -126,7 +126,7 @@ class DB:
         table = self.__adapt_name(config["namespace"])
         cur = self.__conn.cursor()
         if limit is not None:
-            cur.execute(f"SELECT * FROM {table} ORDER BY timestamp DESC LIMIT {limit}")
+            cur.execute(f"SELECT * FROM (SELECT * FROM {table} ORDER BY timestamp DESC LIMIT {limit}) ORDER BY timestamp ASC")
         else:
             cur.execute(f"SELECT * FROM {table}")
         data = cur.fetchall()
@@ -137,7 +137,7 @@ class DB:
     def get_error_count_data(self, limit: int = None) -> Tuple[Tuple, List[str]]:
         cur = self.__conn.cursor()
         if limit is not None:
-            cur.execute(f"SELECT * FROM error_count ORDER BY timestamp DESC LIMIT {limit}")
+            cur.execute(f"SELECT * FROM (SELECT * FROM error_count ORDER BY timestamp DESC LIMIT {limit}) ORDER BY timestamp ASC")
         else:
             cur.execute("SELECT * FROM error_count")
         data = cur.fetchall()

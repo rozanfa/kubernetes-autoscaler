@@ -13,6 +13,7 @@ class Predictor:
 
     def predict(self, timestamp: float) -> pd.DataFrame | None:
         data, colnames = self.db.get_data(limit=self.n_steps)
+        print("Data:", data)
         print("Data length:", len(data))
 
         if len(data) < self.n_steps:
@@ -28,6 +29,7 @@ class Predictor:
         prediction = self.model.predict(transformed_data)
         prediction = self.scaler.inverse_transform(prediction)
         prediction = pd.DataFrame(prediction, columns=data.columns)
+        prediction = prediction.clip(lower=0)
         self.__save_to_db(prediction, timestamp + self.periode)
         return prediction
 

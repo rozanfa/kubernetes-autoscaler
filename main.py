@@ -35,6 +35,7 @@ def main():
 
     collector = DataCollector(node_names, db)
 
+    print("Using model:", config["model_path"])
     model = load_model(config["model_path"])
     minMaxScaler = joblib.load(config["scaler_path"])
     predictor = Predictor(model, minMaxScaler, db)

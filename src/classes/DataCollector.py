@@ -29,11 +29,15 @@ class DataCollector:
         print("previous timestamp:", self.previous_timestamp)
         print("previous previous timestamp:", self.previous_previous_timestamp)
 
+
         if self.previous_previous_data is not None:
             # Subtract only the cpu usage of the previous data from the current data
-            cpu_cols = [col for col in df.columns if "_cpu" in col]
-            df[cpu_cols] = (df[cpu_cols] - self.previous_previous_data[cpu_cols]) / (timestamp - self.previous_previous_timestamp)
-            df[cpu_cols] = df[cpu_cols].clip(lower=0)
+            try:
+                cpu_cols = [col for col in df.columns if "_cpu" in col]
+                df[cpu_cols] = (df[cpu_cols] - self.previous_previous_data[cpu_cols]) / (timestamp - self.previous_previous_timestamp)
+                df[cpu_cols] = df[cpu_cols].clip(lower=0)
+            except KeyError as e:
+                print("Error:", e)
 
             self.db.insert_actual_data(df, timestamp)
             self.db.insert_error_count_data(error_count, timestamp)
