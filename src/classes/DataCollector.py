@@ -31,7 +31,7 @@ class DataCollector:
 
 
         if self.previous_previous_data is not None:
-            # Subtract only the cpu usage of the previous data from the current data
+            # Subtract only the cpu usage of the previous previous data from the current data
             try:
                 cpu_cols = [col for col in df.columns if "_cpu" in col]
                 df[cpu_cols] = (df[cpu_cols] - self.previous_previous_data[cpu_cols]) / (timestamp - self.previous_previous_timestamp)

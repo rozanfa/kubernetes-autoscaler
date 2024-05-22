@@ -23,9 +23,10 @@ def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: P
     collector.collect_data(timestamp)
     predicted_data = predictor.predict(timestamp)
     print("Predicted data:", predicted_data)
+    scaler.calculate_and_scale(predicted_data, timestamp)
 
-    if predicted_data is not None:
-        scaler.calculate_and_scale(predicted_data, timestamp)
+    # if predicted_data is not None:
+    #     scaler.calculate_and_scale(predicted_data, timestamp)
 
 def main():
     kubernetes_config.load_kube_config()

@@ -24,6 +24,9 @@ class Scaler:
         print("Current replicas:", current_replicas)
         self.db.insert_replica_count_data(current_replicas, timestamp)
 
+        if prediction is None:
+            return
+
         for container in self.containers:
             container_key = self.__adapt_name(container)
             if self.containers[container].get("desired_metrics") == None:
@@ -57,11 +60,9 @@ class Scaler:
 
 
     def __scale_a_container(self, container_name: str, desired_replicas: int):
-        name = container_name 
-        namespace = self.namespace
         body = {"spec":{"replicas": desired_replicas}} 
         pretty = 'true'
         try:
-            api_response = self.api_instance.patch_namespaced_deployment(name, namespace, body, pretty=pretty)
+            api_response = self.api_instance.patch_namespaced_deployment(container_name, self.namespace, body, pretty=pretty)
         except ApiException as e:
             print("Exception when calling AppsV1Api->patch_namespaced_deployment: %s\n" % e)
