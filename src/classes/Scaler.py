@@ -51,6 +51,8 @@ class Scaler:
             desired_replicas = max(desired_replicas, self.containers[container].get("min_replicas"))
             desired_replicas = min(desired_replicas, self.containers[container].get("max_replicas"))
 
+            print("Scaling not activated")
+            continue
             if current_replicas[container] != desired_replicas:
                 print("=> Scaling", container, "from", current_replicas[container], "to", desired_replicas)
                 self.__scale_a_container(container, desired_replicas)
