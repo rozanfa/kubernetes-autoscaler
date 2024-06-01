@@ -1,17 +1,19 @@
 from kubernetes import client
 from kubernetes.client.rest import ApiException
-from src.lib.config_reader import config
+from src.classes.ConfigManager import ConfigManager
 import pandas as pd
 import math
 from src.classes.DB import DB
+
+config = ConfigManager.get_config()
 
 class Scaler:
     def __init__(self, db: DB):
         self.db = db
         self.api_client = client.ApiClient()
         self.api_instance = client.AppsV1Api(self.api_client)
-        self.containers = config["containers"]
-        self.namespace = config["namespace"]
+        self.containers = config.containers
+        self.namespace = config.namespace
 
     def __adapt_name(self, name: str):
         return name.replace("-", "_")
@@ -51,13 +53,12 @@ class Scaler:
             desired_replicas = max(desired_replicas, self.containers[container].get("min_replicas"))
             desired_replicas = min(desired_replicas, self.containers[container].get("max_replicas"))
 
-            print("Scaling not activated")
-            continue
             if current_replicas[container] != desired_replicas:
                 print("=> Scaling", container, "from", current_replicas[container], "to", desired_replicas)
                 self.__scale_a_container(container, desired_replicas)
             else:
-                print("Skipping", container)
+                pass
+                # print("Skipping", container)
         
 
 

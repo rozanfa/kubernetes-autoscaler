@@ -1,19 +1,19 @@
-from src.lib.config_reader import config
+from src.classes.ConfigManager import ConfigManager
 from src.classes.DB import DB
 import pandas as pd
-import logging
+config = ConfigManager.get_config()
 
 class Predictor:
     def __init__(self, model, scaler, db: DB):
         self.model = model
         self.scaler = scaler
         self.db = db
-        self.n_steps = config.get("n_steps")
-        self.periode = config.get("periode")
+        self.n_steps = config.n_steps
+        self.periode = config.periode
 
     def predict(self, timestamp: float) -> pd.DataFrame | None:
         data, colnames = self.db.get_data(limit=self.n_steps)
-        print("Data:", data)
+        # print("Data:", data)
         print("Data length:", len(data))
 
         if len(data) < self.n_steps:
@@ -25,7 +25,7 @@ class Predictor:
         data.drop(["id", "timestamp"], axis=1, inplace=True)
 
         transformed_data = self.scaler.transform(data)
-        transformed_data = transformed_data.reshape(1, self.n_steps, len(config["containers"]) * 2)
+        transformed_data = transformed_data.reshape(1, self.n_steps, len(config.containers) * 2)
         prediction = self.model.predict(transformed_data)
         prediction = self.scaler.inverse_transform(prediction)
         prediction = pd.DataFrame(prediction, columns=data.columns)

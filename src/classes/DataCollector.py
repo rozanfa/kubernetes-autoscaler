@@ -1,10 +1,8 @@
+from src.lib.query import query_all_nodes
 from kubernetes import client
 from src.classes.DB import DB
-from src.lib.query import query_all_nodes
 import pandas as pd
 import logging
-import time
-from src.lib.config_reader import config
 
 class DataCollector:
     def __init__(self, node_names: str, db: DB):

@@ -4,7 +4,7 @@ import os
 from typing import Dict
 from src.dataclasses.dataclasses import PodMetric, ContainerMetric, NodeMetric
 from psycopg2.extensions import connection
-from src.lib.config_reader import config
+from src.classes.ConfigManager import ConfigManager
 from pandas import DataFrame
 from typing import Tuple, List
 
@@ -13,6 +13,7 @@ load_dotenv()
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
+config = ConfigManager.get_config()
 
 class DB:
     def __init__(self, conn: connection = None):
@@ -41,11 +42,11 @@ class DB:
 
     def create_tables(self):
         cur = self.__conn.cursor()
-        metric_table_commands = "\n".join(list(map(self.__to_metric_table_creation_command, config["containers"].keys())))
-        replica_table_commands = "\n".join(list(map(self.__to_replica_table_creation_command, config["containers"].keys())))
+        metric_table_commands = "\n".join(list(map(self.__to_metric_table_creation_command, config.containers.keys())))
+        replica_table_commands = "\n".join(list(map(self.__to_replica_table_creation_command, config.containers.keys())))
 
         create_actual_data_table_command = f"""
-        CREATE TABLE IF NOT EXISTS {self.__adapt_name(config["namespace"])} (
+        CREATE TABLE IF NOT EXISTS {self.__adapt_name(config.namespace)} (
             id SERIAL PRIMARY KEY,
             {metric_table_commands}
             timestamp BIGINT
@@ -55,7 +56,7 @@ class DB:
         cur.execute(create_actual_data_table_command)
 
         create_predicted_data_table_command = f"""
-        CREATE TABLE IF NOT EXISTS {self.__adapt_name(config["namespace"])}_predicted (
+        CREATE TABLE IF NOT EXISTS {self.__adapt_name(config.namespace)}_predicted (
             id SERIAL PRIMARY KEY,
             {metric_table_commands}
             timestamp BIGINT
@@ -65,16 +66,16 @@ class DB:
         cur.execute(create_predicted_data_table_command)
 
         cur.execute(f"""
-            CREATE TABLE IF NOT EXISTS {self.__adapt_name(config["namespace"])}_error_count (
+            CREATE TABLE IF NOT EXISTS {self.__adapt_name(config.namespace)}_error_count (
                 id SERIAL PRIMARY KEY,
                 error_count INT,
                 insert_timestamp BIGINT
             )
         """)
 
-        metric_table_commands = "\n".join(list(map(self.__to_metric_table_creation_command, config["containers"].keys())))
+        metric_table_commands = "\n".join(list(map(self.__to_metric_table_creation_command, config.containers.keys())))
         create_replica_table_command = f"""
-        CREATE TABLE IF NOT EXISTS {self.__adapt_name(config["namespace"])}_replicas (
+        CREATE TABLE IF NOT EXISTS {self.__adapt_name(config.namespace)}_replicas (
             id SERIAL PRIMARY KEY,
             {replica_table_commands}
             timestamp BIGINT
@@ -89,7 +90,7 @@ class DB:
     def insert_actual_data(self, data: DataFrame, timestamp: float):
         cur = self.__conn.cursor()
         command = f"""
-        INSERT INTO {self.__adapt_name(config["namespace"])} ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
+        INSERT INTO {self.__adapt_name(config.namespace)} ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
         """
         cur.execute(command)
         self.__conn.commit()
@@ -98,7 +99,7 @@ class DB:
     def insert_predicted_data(self, data: DataFrame, timestamp: float):
         cur = self.__conn.cursor()
         command = f"""
-        INSERT INTO {self.__adapt_name(config["namespace"])}_predicted ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
+        INSERT INTO {self.__adapt_name(config.namespace)}_predicted ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
         """
         cur.execute(command)
         self.__conn.commit()
@@ -108,7 +109,7 @@ class DB:
     def insert_error_count_data(self, error_count: int, timestamp: float):
         cur = self.__conn.cursor()
 
-        cur.execute(f"INSERT INTO {self.__adapt_name(config['namespace'])}_error_count (error_count, insert_timestamp) VALUES (%s, %s)", (error_count, timestamp))
+        cur.execute(f"INSERT INTO {self.__adapt_name(config.namespace)}_error_count (error_count, insert_timestamp) VALUES (%s, %s)", (error_count, timestamp))
 
         self.__conn.commit()
         cur.close()
@@ -116,14 +117,14 @@ class DB:
     def insert_replica_count_data(self, data: Dict[str, int], timestamp: float):
         cur = self.__conn.cursor()
         command = f"""
-        INSERT INTO {self.__adapt_name(config["namespace"])}_replicas ({", ".join(list(map(self.__adapt_name, data.keys())))}, timestamp) VALUES ({", ".join(map(str, list(data.values())))}, {timestamp});
+        INSERT INTO {self.__adapt_name(config.namespace)}_replicas ({", ".join(list(map(self.__adapt_name, data.keys())))}, timestamp) VALUES ({", ".join(map(str, list(data.values())))}, {timestamp});
         """
         cur.execute(command)
         self.__conn.commit()
         cur.close()
         
     def get_data(self, limit: int = None):
-        table = self.__adapt_name(config["namespace"])
+        table = self.__adapt_name(config.namespace)
         cur = self.__conn.cursor()
         if limit is not None:
             cur.execute(f"SELECT * FROM (SELECT * FROM {table} ORDER BY timestamp DESC LIMIT {limit}) a ORDER BY timestamp ASC")
