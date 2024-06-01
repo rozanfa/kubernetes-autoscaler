@@ -1,14 +1,15 @@
 from tensorflow.keras.models import load_model
 from kubernetes import config as kubernetes_config, client as kubernetes_client
 from src.classes.DataCollector import DataCollector
+from src.classes.ConfigManager import ConfigManager
 from src.classes.LoggingPool import LoggingPool
 from src.classes.Predictor import Predictor
 from src.classes.Scaler import Scaler
-from src.lib.config_reader import config
 from src.classes.DB import DB
 import joblib
 import sched
 import time
+import sys
 
 def get_node_names() -> list[str]:
     v1 = kubernetes_client.CoreV1Api()
@@ -22,29 +23,33 @@ def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: P
     timestamp = time.time()
     collector.collect_data(timestamp)
     predicted_data = predictor.predict(timestamp)
-    print("Predicted data:", predicted_data)
+    # print("Predicted data:", predicted_data)
     scaler.calculate_and_scale(predicted_data, timestamp)
 
-    # if predicted_data is not None:
-    #     scaler.calculate_and_scale(predicted_data, timestamp)
-
 def main():
+    if len(sys.argv) < 2:
+        print("Usage: python main.py <config_file>")
+        sys.exit(1)
+
     kubernetes_config.load_kube_config()
+    ConfigManager.load_config(sys.argv[1])
+    config = ConfigManager.get_config()
+
     db = DB()
     db.create_tables()
     node_names = get_node_names()
 
     collector = DataCollector(node_names, db)
 
-    print("Using model:", config["model_path"])
-    model = load_model(config["model_path"])
-    minMaxScaler = joblib.load(config["scaler_path"])
+    print("Using model:", config.model_path)
+    model = load_model(config.model_path)
+    minMaxScaler = joblib.load(config.scaler_path)
     predictor = Predictor(model, minMaxScaler, db)
 
     scaler = Scaler(db)
 
     scheduler = sched.scheduler(time.time, time.sleep)
-    periode = config.get("periode", 10)
+    periode = config.periode
     try :
         scheduler.enter(0, 1, main_loop, (scheduler, collector, predictor, scaler, periode))
         print("Starting scheduler")
