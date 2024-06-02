@@ -1,5 +1,4 @@
 from src.lib.process import process_pod_or_container, process_node, transform_data
-import time, os
 import pandas as pd
 from multiprocessing.pool import ThreadPool
 from kubernetes import client
@@ -43,27 +42,21 @@ def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataF
                 
         except IndexError:
             print("Error:",row)
-
     transformed_container_data = transform_data(container_data)
     return transformed_container_data, error_count
 
 
-def query_all_nodes(api_client: client.ApiClient, node_names: list[str]) -> tuple[pd.Series, list[str], int]:
+def query_all_nodes(api_client: client.ApiClient, node_names: list[str]) -> tuple[dict, int]:
     pool = ThreadPool(processes=len(node_names))
-    pool_results = []
-    result = pd.DataFrame()
+    pool_results: list[ThreadPool] = []
+    result = dict()
     error_count = 0
-    colnames = None
-
     for node_name in node_names:
         print("Querying node:", node_name)
         pool_results.append(pool.apply_async(query_a_node, ([api_client, node_name])))
 
     for pool_result in pool_results:
         transformed_container_data, new_error_count = pool_result.get()
-        if colnames is None:
-            colnames = transformed_container_data.columns
-        result = pd.concat([result, transformed_container_data], ignore_index=True)
+        result.update(transformed_container_data)
         error_count += new_error_count
-    result = result.mean()
-    return result, colnames, error_count
+    return result, error_count

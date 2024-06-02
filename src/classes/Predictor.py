@@ -26,7 +26,7 @@ class Predictor:
         data.drop(["id", "timestamp"], axis=1, inplace=True)
 
         transformed_data = self.scaler.transform(data)
-        transformed_data = transformed_data.reshape(1, self.n_steps, len(self.containers) * 2)
+        transformed_data = transformed_data.reshape(1, self.n_steps, len(self.containers) * 3)
         prediction = self.model.predict(transformed_data)
         prediction = self.scaler.inverse_transform(prediction)
         prediction = pd.DataFrame(prediction, columns=data.columns)

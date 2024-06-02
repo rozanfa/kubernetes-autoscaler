@@ -17,12 +17,15 @@ class Scaler:
 
     def __adapt_name(self, name: str):
         return name.replace("-", "_")
-
-    def calculate_and_scale(self, prediction: pd.DataFrame, timestamp: float):
+    
+    def __get_replicas(self):
         current_deployment_data = self.api_instance.list_namespaced_deployment(self.namespace)
-        current_replicas = {
+        return {
             item.metadata.name: item.spec.replicas for item in current_deployment_data.items
         }
+
+    def calculate_and_scale(self, prediction: pd.DataFrame, timestamp: float):
+        current_replicas = self.__get_replicas()
         print("Current replicas:", current_replicas)
         self.db.insert_replica_count_data(current_replicas, timestamp)
 

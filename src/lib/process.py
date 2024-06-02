@@ -1,9 +1,5 @@
 from typing import Dict
 from src.dataclasses.dataclasses import PodMetric, ContainerMetric, NodeMetric
-import time
-import pandas as pd
-from src.classes.ConfigManager import ConfigManager
-
 
 def process_pod_or_container(row: list[str], pods: Dict[str, PodMetric], containers: Dict[str, ContainerMetric]):
     raw_name = row[0]
@@ -72,14 +68,13 @@ def process_node(row: list[str], nodes: Dict[str, NodeMetric], node_name: str):
                 nodes[node_name].cpu_timestamp = int(timestamp)
 
 
-def transform_data(containers: Dict[str, ContainerMetric]):
-    config = ConfigManager.get_config()
-    data = pd.DataFrame(containers.values(), columns=ContainerMetric.__annotations__.keys())
-    data = data.loc[data["container"].isin(config.containers.keys())]
-    data["timestamp"] = int(time.time())
-    data.drop(["pod", "namespace"], axis=1, inplace=True)
-    data = data.groupby("container").mean().reset_index()
-    data = data.pivot(index="timestamp", columns="container", values=['cpu', 'memory'])
-    data.columns = [f'{col[1]}_{col[0]}' for col in data.columns]
+def transform_data(container_data: Dict[str, ContainerMetric]):
+    data = {
+        pod_name: {
+            "cpu": container_data[pod_name].cpu,
+            "memory": container_data[pod_name].memory,
+            "container": container_data[pod_name].container,
+        }
+        for pod_name in container_data
+    }
     return data
-        

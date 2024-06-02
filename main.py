@@ -22,9 +22,8 @@ def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: P
 
     timestamp = time.time()
     collector.collect_data(timestamp)
-    predicted_data = predictor.predict(timestamp)
-    # print("Predicted data:", predicted_data)
-    scaler.calculate_and_scale(predicted_data, timestamp)
+    # predicted_data = predictor.predict(timestamp)
+    # scaler.calculate_and_scale(predicted_data, timestamp)
 
 def main():
     if len(sys.argv) < 2:

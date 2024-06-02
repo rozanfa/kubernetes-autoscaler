@@ -28,6 +28,7 @@ class DB:
         return f"""
             {self.__adapt_name(container)}_cpu DOUBLE PRECISION,
             {self.__adapt_name(container)}_memory DOUBLE PRECISION,
+            {self.__adapt_name(container)}_replicas INTEGER,
         """
     
     def __to_replica_table_creation_command(self, container: str):
@@ -154,13 +155,3 @@ class DB:
     def close(self):
         self.__conn.close()
 
-if __name__ == "__main__":
-    db = DB()
-    db.create_tables()
-    
-    db.insert_batch_pod_data({"pod1": PodMetric("pod1", "namespace1", 1.0, 1.0, 1.0, 1.0)})
-    db.insert_batch_container_data({"container1": ContainerMetric("container1", "namespace1", 1.0, 1.0, 1.0, 1.0)})
-    db.insert_batch_node_data({"node1": NodeMetric("node1", 1.0, 1.0, 1.0, 1.0)})
-    db.insert_error_count_data(1, 1.0)
-
-    db.close

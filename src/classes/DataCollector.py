@@ -1,54 +1,79 @@
+from src.classes.ConfigManager import ConfigManager
 from src.lib.query import query_all_nodes
 from kubernetes import client
 from src.classes.DB import DB
 import pandas as pd
 import logging
+from typing import Dict
+from src.dataclasses.dataclasses import ContainerMetric
+from pandas import DataFrame
 
 class DataCollector:
     def __init__(self, node_names: str, db: DB):
+        config = ConfigManager.get_config()
         self.db = db
         self.node_names = node_names
         self.api_client = client.ApiClient()
+        self.api_instance = client.AppsV1Api(self.api_client)
         self.previous_data = None
         self.previous_timestamp = None
         self.previous_previous_data = None
         self.previous_previous_timestamp = None
+        self.namespace = config.namespace
+        self.containers = config.containers
 
+    def __get_replicas(self):
+        current_deployment_data = self.api_instance.list_namespaced_deployment(self.namespace)
+        current_replicas = {
+            f"{item.metadata.name}_replicas": item.spec.replicas for item in current_deployment_data.items
+        }
+        return current_replicas
+    
+    def __transform_data(self, data: Dict[str, ContainerMetric], timestamp: int) -> DataFrame:
+        df = pd.DataFrame(data.values(), columns=["cpu", "memory", "container"]).fillna(0)
+        df = df.loc[df["container"].isin(self.containers.keys())]
+        df = df.assign(timestamp=timestamp)
+        df = df.groupby("container").mean().reset_index()
+        df = df.pivot(index="timestamp", columns="container", values=['cpu', 'memory'])
+        df.columns = [f'{col[1]}_{col[0]}' for col in df.columns]
+
+        current_replicas = self.__get_replicas()
+        df = df.assign(**current_replicas)
+        return df
 
     def collect_data(self, timestamp: int) -> None:
-        data, colnames, error_count = query_all_nodes(self.api_client, self.node_names)
+        data, error_count = query_all_nodes(self.api_client, self.node_names)
         if error_count > 0:
             logging.error(f"Error count: {error_count}")
 
-        cumulative_df = data.to_frame(0).T
-
-        df = cumulative_df.copy()
-        print("current timestamp:", timestamp)
-        print("previous timestamp:", self.previous_timestamp)
-        print("previous previous timestamp:", self.previous_previous_timestamp)
-
+        # print("current timestamp:", timestamp)
+        # print("previous timestamp:", self.previous_timestamp)
+        # print("previous previous timestamp:", self.previous_previous_timestamp)
 
         if self.previous_previous_data is not None:
-            # Subtract only the cpu usage of the previous previous data from the current data
-            try:
-                cpu_cols = [col for col in df.columns if "_cpu" in col]
-                df[cpu_cols] = (df[cpu_cols] - self.previous_previous_data[cpu_cols]) / (timestamp - self.previous_previous_timestamp)
-                df[cpu_cols] = df[cpu_cols].clip(lower=0)
-            except KeyError as e:
-                print("Error:", e)
+            subtracted_data = {}
+            for pod_name in data:
+                try:
+                    subtracted_data[pod_name] = {
+                        "cpu": data[pod_name]["cpu"] - self.previous_previous_data[pod_name]["cpu"],
+                        "memory": data[pod_name]["memory"],
+                        "container": data[pod_name]["container"],
+                    }
+                except KeyError:
+                    print("KeyError")
+                    pass
+            
+            df = self.__transform_data(subtracted_data, timestamp)
 
             self.db.insert_actual_data(df, timestamp)
-            self.db.insert_error_count_data(error_count, timestamp)
-
-            print("Data collected")
-
+            
+        
         if self.previous_data is not None:
-            self.previous_previous_data = self.previous_data
+            self.previous_previous_data = self.previous_data.copy()
             self.previous_previous_timestamp = self.previous_timestamp
 
-        self.previous_data = cumulative_df
+        self.previous_data = data.copy()
         self.previous_timestamp = timestamp
-
 
 
     def close(self):
