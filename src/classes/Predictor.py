@@ -1,10 +1,11 @@
 from src.classes.ConfigManager import ConfigManager
 from src.classes.DB import DB
 import pandas as pd
-config = ConfigManager.get_config()
 
 class Predictor:
     def __init__(self, model, scaler, db: DB):
+        config = ConfigManager.get_config()
+        self.container = config.containers
         self.model = model
         self.scaler = scaler
         self.db = db
@@ -25,7 +26,7 @@ class Predictor:
         data.drop(["id", "timestamp"], axis=1, inplace=True)
 
         transformed_data = self.scaler.transform(data)
-        transformed_data = transformed_data.reshape(1, self.n_steps, len(config.containers) * 2)
+        transformed_data = transformed_data.reshape(1, self.n_steps, len(self.containers) * 2)
         prediction = self.model.predict(transformed_data)
         prediction = self.scaler.inverse_transform(prediction)
         prediction = pd.DataFrame(prediction, columns=data.columns)

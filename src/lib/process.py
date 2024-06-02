@@ -4,7 +4,6 @@ import time
 import pandas as pd
 from src.classes.ConfigManager import ConfigManager
 
-config = ConfigManager.get_config()
 
 def process_pod_or_container(row: list[str], pods: Dict[str, PodMetric], containers: Dict[str, ContainerMetric]):
     raw_name = row[0]
@@ -74,6 +73,7 @@ def process_node(row: list[str], nodes: Dict[str, NodeMetric], node_name: str):
 
 
 def transform_data(containers: Dict[str, ContainerMetric]):
+    config = ConfigManager.get_config()
     data = pd.DataFrame(containers.values(), columns=ContainerMetric.__annotations__.keys())
     data = data.loc[data["container"].isin(config.containers.keys())]
     data["timestamp"] = int(time.time())

@@ -5,10 +5,10 @@ import pandas as pd
 import math
 from src.classes.DB import DB
 
-config = ConfigManager.get_config()
 
 class Scaler:
     def __init__(self, db: DB):
+        config = ConfigManager.get_config()
         self.db = db
         self.api_client = client.ApiClient()
         self.api_instance = client.AppsV1Api(self.api_client)

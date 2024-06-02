@@ -13,7 +13,6 @@ load_dotenv()
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-config = ConfigManager.get_config()
 
 class DB:
     def __init__(self, conn: connection = None):
@@ -41,6 +40,7 @@ class DB:
         return name.replace("-", "_")
 
     def create_tables(self):
+        config = ConfigManager.get_config()
         cur = self.__conn.cursor()
         metric_table_commands = "\n".join(list(map(self.__to_metric_table_creation_command, config.containers.keys())))
         replica_table_commands = "\n".join(list(map(self.__to_replica_table_creation_command, config.containers.keys())))
@@ -88,6 +88,7 @@ class DB:
         cur.close()
 
     def insert_actual_data(self, data: DataFrame, timestamp: float):
+        config = ConfigManager.get_config()
         cur = self.__conn.cursor()
         command = f"""
         INSERT INTO {self.__adapt_name(config.namespace)} ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
@@ -97,6 +98,7 @@ class DB:
         cur.close()
 
     def insert_predicted_data(self, data: DataFrame, timestamp: float):
+        config = ConfigManager.get_config()
         cur = self.__conn.cursor()
         command = f"""
         INSERT INTO {self.__adapt_name(config.namespace)}_predicted ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
@@ -107,6 +109,7 @@ class DB:
 
 
     def insert_error_count_data(self, error_count: int, timestamp: float):
+        config = ConfigManager.get_config()
         cur = self.__conn.cursor()
 
         cur.execute(f"INSERT INTO {self.__adapt_name(config.namespace)}_error_count (error_count, insert_timestamp) VALUES (%s, %s)", (error_count, timestamp))
@@ -115,6 +118,7 @@ class DB:
         cur.close()
 
     def insert_replica_count_data(self, data: Dict[str, int], timestamp: float):
+        config = ConfigManager.get_config()
         cur = self.__conn.cursor()
         command = f"""
         INSERT INTO {self.__adapt_name(config.namespace)}_replicas ({", ".join(list(map(self.__adapt_name, data.keys())))}, timestamp) VALUES ({", ".join(map(str, list(data.values())))}, {timestamp});
@@ -124,6 +128,7 @@ class DB:
         cur.close()
         
     def get_data(self, limit: int = None):
+        config = ConfigManager.get_config()
         table = self.__adapt_name(config.namespace)
         cur = self.__conn.cursor()
         if limit is not None:
