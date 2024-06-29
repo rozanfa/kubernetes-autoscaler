@@ -7,6 +7,7 @@ import logging
 from typing import Dict
 from src.dataclasses.dataclasses import ContainerMetric
 from pandas import DataFrame
+import numpy as np
 
 class DataCollector:
     def __init__(self, node_names: str, db: DB):
@@ -55,17 +56,22 @@ class DataCollector:
             for pod_name in data:
                 try:
                     subtracted_data[pod_name] = {
-                        "cpu": data[pod_name]["cpu"] - self.previous_previous_data[pod_name]["cpu"],
+                        "cpu": (data[pod_name]["cpu"] - self.previous_previous_data[pod_name]["cpu"]) / (timestamp - self.previous_previous_timestamp),
                         "memory": data[pod_name]["memory"],
                         "container": data[pod_name]["container"],
                     }
+                    if np.isnan(subtracted_data[pod_name]["cpu"]):
+                        subtracted_data[pod_name]["cpu"] = 0
                 except KeyError:
-                    print("KeyError")
+                    print(f"KeyError {pod_name}")
                     pass
             
             df = self.__transform_data(subtracted_data, timestamp)
-
+            print("Inserting data...")
             self.db.insert_actual_data(df, timestamp)
+            print("Data inserted")
+        else:
+            print("No previous data available. Skipping...")
             
         
         if self.previous_data is not None:

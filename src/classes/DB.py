@@ -91,11 +91,19 @@ class DB:
     def insert_actual_data(self, data: DataFrame, timestamp: float):
         config = ConfigManager.get_config()
         cur = self.__conn.cursor()
-        command = f"""
-        INSERT INTO {self.__adapt_name(config.namespace)} ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
-        """
-        cur.execute(command)
-        self.__conn.commit()
+        try:
+            command = f"""
+            INSERT INTO {self.__adapt_name(config.namespace)} ({", ".join(list(map(self.__adapt_name, data.columns)))}, timestamp) VALUES ({", ".join(data.values[0].astype(str))}, {timestamp});
+            """
+            cur.execute(command)
+            self.__conn.commit()
+        except Exception as e:
+            print("Error:", e)
+            print("df:", data)
+            print("Columns:", list(map(self.__adapt_name, data.columns)))
+            print("Data:", data.values[0].astype(str))
+            print("Command:", command)
+            raise e
         cur.close()
 
     def insert_predicted_data(self, data: DataFrame, timestamp: float):

@@ -54,6 +54,8 @@ def query_all_nodes(api_client: client.ApiClient, node_names: list[str]) -> tupl
     for node_name in node_names:
         print("Querying node:", node_name)
         pool_results.append(pool.apply_async(query_a_node, ([api_client, node_name])))
+        print(f"Querying node {node_name} done")
+    pool.close()
 
     for pool_result in pool_results:
         transformed_container_data, new_error_count = pool_result.get()
