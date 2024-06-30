@@ -12,7 +12,7 @@ class Predictor:
         self.n_steps = config.n_steps
         self.periode = config.periode
 
-    def predict(self, timestamp: float) -> pd.DataFrame | None:
+    def predict(self, timestamp: int) -> pd.DataFrame | None:
         data, colnames = self.db.get_data(limit=self.n_steps)
         # print("Data:", data)
         print("Data length:", len(data))
@@ -34,7 +34,7 @@ class Predictor:
         self.__save_to_db(prediction, timestamp + self.periode)
         return prediction
 
-    def __save_to_db(self, prediction: pd.DataFrame, timestamp: float):
+    def __save_to_db(self, prediction: pd.DataFrame, timestamp: int):
         self.db.insert_predicted_data(prediction, timestamp)
     
     def close(self):

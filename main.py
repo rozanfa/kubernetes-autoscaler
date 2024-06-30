@@ -20,10 +20,10 @@ def get_node_names() -> list[str]:
 def main_loop(scheduler: sched.scheduler, collector: DataCollector, predictor: Predictor, scaler: Scaler, periode: int):
     scheduler.enter(periode, 1, main_loop, (scheduler, collector, predictor, scaler, periode))
 
-    timestamp = time.time()
+    timestamp = int(time.time())
     collector.collect_data(timestamp)
-    # predicted_data = predictor.predict(timestamp)
-    # scaler.calculate_and_scale(predicted_data, timestamp)
+    predicted_data = predictor.predict(timestamp)
+    scaler.calculate_and_scale(predicted_data, timestamp)
 
 def main():
     if len(sys.argv) < 2:

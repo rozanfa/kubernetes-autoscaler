@@ -24,7 +24,7 @@ class Scaler:
             item.metadata.name: item.spec.replicas for item in current_deployment_data.items
         }
 
-    def calculate_and_scale(self, prediction: pd.DataFrame, timestamp: float):
+    def calculate_and_scale(self, prediction: pd.DataFrame, timestamp: int):
         current_replicas = self.__get_replicas()
         print("Current replicas:", current_replicas)
         self.db.insert_replica_count_data(current_replicas, timestamp)

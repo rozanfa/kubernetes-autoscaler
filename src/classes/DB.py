@@ -88,7 +88,7 @@ class DB:
         self.__conn.commit()
         cur.close()
 
-    def insert_actual_data(self, data: DataFrame, timestamp: float):
+    def insert_actual_data(self, data: DataFrame, timestamp: int):
         config = ConfigManager.get_config()
         cur = self.__conn.cursor()
         try:
@@ -106,7 +106,7 @@ class DB:
             raise e
         cur.close()
 
-    def insert_predicted_data(self, data: DataFrame, timestamp: float):
+    def insert_predicted_data(self, data: DataFrame, timestamp: int):
         config = ConfigManager.get_config()
         cur = self.__conn.cursor()
         command = f"""
@@ -117,7 +117,7 @@ class DB:
         cur.close()
 
 
-    def insert_error_count_data(self, error_count: int, timestamp: float):
+    def insert_error_count_data(self, error_count: int, timestamp: int):
         config = ConfigManager.get_config()
         cur = self.__conn.cursor()
 
@@ -126,7 +126,7 @@ class DB:
         self.__conn.commit()
         cur.close()
 
-    def insert_replica_count_data(self, data: Dict[str, int], timestamp: float):
+    def insert_replica_count_data(self, data: Dict[str, int], timestamp: int):
         config = ConfigManager.get_config()
         cur = self.__conn.cursor()
         command = f"""
