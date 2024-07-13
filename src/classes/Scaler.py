@@ -72,3 +72,6 @@ class Scaler:
             api_response = self.api_instance.patch_namespaced_deployment(container_name, self.namespace, body, pretty=pretty)
         except ApiException as e:
             print("Exception when calling AppsV1Api->patch_namespaced_deployment: %s\n" % e)
+
+    def close(self):
+        self.db.close()

@@ -5,7 +5,7 @@ import pandas as pd
 class Predictor:
     def __init__(self, model, scaler, db: DB):
         config = ConfigManager.get_config()
-        self.container = config.containers
+        self.containers = config.containers
         self.model = model
         self.scaler = scaler
         self.db = db
@@ -30,7 +30,8 @@ class Predictor:
         prediction = self.model.predict(transformed_data)
         prediction = self.scaler.inverse_transform(prediction)
         prediction = pd.DataFrame(prediction, columns=data.columns)
-        prediction = prediction.clip(lower=0)
+        prediction.drop([col for col in prediction.columns if col.endswith("_replicas")], axis=1, inplace=True)
+        prediction.clip(lower=0, inplace=True)
         self.__save_to_db(prediction, timestamp + self.periode)
         return prediction
 
