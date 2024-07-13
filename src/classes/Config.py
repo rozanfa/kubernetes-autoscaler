@@ -1,6 +1,7 @@
 import json
 import sys
 from dataclasses import dataclass
+from typing import Literal
 
 @dataclass
 class Metric:
@@ -21,6 +22,7 @@ class Config:
     periode: int
     model_path: str
     scaler_path: str
+    model_type: Literal["a", "b"]
 
 def load_config(path: str) -> Config:
     with open(path, "r") as f:
@@ -31,7 +33,8 @@ def load_config(path: str) -> Config:
             n_steps=config["n_steps"],
             periode=config["periode"],
             model_path=config["model_path"],
-            scaler_path=config["scaler_path"]
+            scaler_path=config["scaler_path"],
+            model_type=config.get("model_type", "a")
         )
 
 if __name__ == "__main__":

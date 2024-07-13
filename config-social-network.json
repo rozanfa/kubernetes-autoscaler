@@ -219,6 +219,7 @@
     "namespace": "social-network",
     "n_steps": 20,
     "periode": 10,
-    "model_path": "models/sn5/model_1_20.keras",
-    "scaler_path": "models/sn5/maxabs-scaler.pkl"
+    "model_path": "models/sn6/model_1b_20.keras",
+    "scaler_path": "models/sn6/maxabs-scaler.pkl",
+    "model_type": "b"
 }

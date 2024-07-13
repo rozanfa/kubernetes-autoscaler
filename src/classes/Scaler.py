@@ -24,9 +24,8 @@ class Scaler:
             item.metadata.name: item.spec.replicas for item in current_deployment_data.items
         }
 
-    def calculate_and_scale(self, prediction: pd.DataFrame, timestamp: int):
+    def calculate_and_scale(self, prediction: pd.DataFrame | None, timestamp: int):
         current_replicas = self.__get_replicas()
-        print("Current replicas:", current_replicas)
         self.db.insert_replica_count_data(current_replicas, timestamp)
 
         if prediction is None:
@@ -41,17 +40,19 @@ class Scaler:
             desired_replicas_cpu = 1
             if desired_cpu != None:
                 desired_replicas_cpu = math.ceil(current_replicas[container] * (prediction[f"{container_key}_cpu"].iloc[0] / self.containers[container]["desired_metrics"]["cpu"]))
-            else:
-                print("No desired CPU for", container)
 
             desired_memory = self.containers[container]["desired_metrics"].get("memory")
             desired_replicas_memory = 1
             if desired_memory != None:
                 desired_replicas_memory = math.ceil(current_replicas[container] * (prediction[f"{container_key}_memory"].iloc[0] / self.containers[container]["desired_metrics"]["memory"]))
-            else:
-                print("No desired memory for", container)
 
-            print("Desired replicas for", container, "CPU:", desired_replicas_cpu, "Memory:", desired_replicas_memory, "|", "Desired CPU:", desired_cpu, "Memory:", desired_memory, "|", "Prediction:", prediction[f"{container_key}_cpu"].iloc[0], prediction[f"{container_key}_memory"].iloc[0], "|", "Current replicas:", current_replicas[container])
+            col_1_1 = f"Desired replicas for {container}:"
+            col_1_2 = f"CPU: {desired_replicas_cpu} Memory: {desired_replicas_memory}"
+            col_2 = f"Desired CPU: {desired_cpu} Memory: {desired_memory}"
+            col_4_1 = f"CPU: {prediction[f'{container_key}_cpu'].iloc[0]:.2f}"
+            col_4_2 = f"Memory: {prediction[f'{container_key}_memory'].iloc[0]:.2f}"
+            col_5 = f"Current replicas: {current_replicas[container]}"
+            print(f"{col_1_1 : <48} {col_1_2 : <20} | {col_2 : <31} | Prediction: {col_4_1 : <15} {col_4_2 : <18} | {col_5}")
             desired_replicas = max(desired_replicas_cpu, desired_replicas_memory)
             desired_replicas = max(desired_replicas, self.containers[container].get("min_replicas"))
             desired_replicas = min(desired_replicas, self.containers[container].get("max_replicas"))
