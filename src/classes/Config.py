@@ -39,4 +39,3 @@ def load_config(path: str) -> Config:
 
 if __name__ == "__main__":
     config = load_config(sys.argv[1])
-    print(config)

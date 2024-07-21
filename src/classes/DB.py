@@ -14,6 +14,9 @@ DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
+import logging
+logger = logging.getLogger(__name__)
+
 class DB:
     def __init__(self, conn: connection = None):
         if conn is not None:
@@ -98,11 +101,11 @@ class DB:
             cur.execute(command)
             self.__conn.commit()
         except Exception as e:
-            print("Error:", e)
-            print("df:", data)
-            print("Columns:", list(map(self.__adapt_name, data.columns)))
-            print("Data:", data.values[0].astype(str))
-            print("Command:", command)
+            logger.error("Error:", e)
+            logger.error("df:", data)
+            logger.error("Columns:", list(map(self.__adapt_name, data.columns)))
+            logger.error("Data:", data.values[0].astype(str))
+            logger.error("Command:", command)
             raise e
         cur.close()
 

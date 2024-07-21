@@ -9,6 +9,9 @@ from src.dataclasses.dataclasses import ContainerMetric
 from pandas import DataFrame
 import numpy as np
 
+import logging
+logger = logging.getLogger(__name__)
+
 class DataCollector:
     def __init__(self, node_names: str, db: DB):
         config = ConfigManager.get_config()
@@ -47,10 +50,6 @@ class DataCollector:
         if error_count > 0:
             logging.error(f"Error count: {error_count}")
 
-        # print("current timestamp:", timestamp)
-        # print("previous timestamp:", self.previous_timestamp)
-        # print("previous previous timestamp:", self.previous_previous_timestamp)
-
         if self.previous_previous_data is not None:
             subtracted_data = {}
             for pod_name in data:
@@ -63,15 +62,15 @@ class DataCollector:
                     if np.isnan(subtracted_data[pod_name]["cpu"]):
                         subtracted_data[pod_name]["cpu"] = 0
                 except KeyError:
-                    print(f"KeyError {pod_name}")
+                    logging.debug(f"KeyError {pod_name}")
                     pass
             
             df = self.__transform_data(subtracted_data, timestamp)
-            print("Inserting data...")
+            logging.debug("Inserting data...")
             self.db.insert_actual_data(df, timestamp)
-            print("Data inserted")
+            logging.debug("Data inserted")
         else:
-            print("No previous data available. Skipping...")
+            logging.info("No previous data available. Skipping...")
             
         
         if self.previous_data is not None:

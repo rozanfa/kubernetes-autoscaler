@@ -2,9 +2,11 @@ from src.lib.process import process_pod_or_container, process_node, transform_da
 import pandas as pd
 from multiprocessing.pool import ThreadPool
 from kubernetes import client
+import logging
+logger = logging.getLogger(__name__)
 
 def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataFrame, int]: 
-    print("Doing stuff...")
+    logger.debug("Doing stuff...")
 
     # Create a dictionary with the data
     pod_data = {}
@@ -17,7 +19,7 @@ def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataF
         data = str(response[0])
         rows = data.split("\n")
     except Exception as e:
-        print(f"Error[{node_name}]: {e}")
+        logger.error(f"Error[{node_name}]: {e}")
         return pd.DataFrame(), 1
 
     # Remove comments and empty lines
@@ -26,7 +28,7 @@ def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataF
     # Split lines from rows
     rows = [row.split() for row in rows]
 
-    print("Processing data...")
+    logger.debug("Processing data...")
     for row in rows:
         try:
             if row[0] == "scrape_error":
@@ -41,7 +43,7 @@ def query_a_node(api_client: client.ApiClient, node_name: str) -> tuple[pd.DataF
                 process_pod_or_container(row, pod_data, container_data)
                 
         except IndexError:
-            print("Error:",row)
+            logger.error("Error:",row)
     transformed_container_data = transform_data(container_data)
     return transformed_container_data, error_count
 
@@ -52,9 +54,9 @@ def query_all_nodes(api_client: client.ApiClient, node_names: list[str]) -> tupl
     result = dict()
     error_count = 0
     for node_name in node_names:
-        print("Querying node:", node_name)
+        logger.debug("Querying node:", node_name)
         pool_results.append(pool.apply_async(query_a_node, ([api_client, node_name])))
-        print(f"Querying node {node_name} done")
+        logger.debug(f"Querying node {node_name} done")
     pool.close()
 
     for pool_result in pool_results:

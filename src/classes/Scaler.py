@@ -4,7 +4,10 @@ from src.classes.ConfigManager import ConfigManager
 import pandas as pd
 import math
 from src.classes.DB import DB
+from src.classes.Color import Color
 
+import logging
+logger = logging.getLogger(__name__)
 
 class Scaler:
     def __init__(self, db: DB):
@@ -53,17 +56,21 @@ class Scaler:
             col_4_2 = f"Memory: {prediction[f'{container_key}_memory'].iloc[0]:.2f}"
             col_5 = f"Current replicas: {current_replicas[container]}"
             print(f"{col_1_1 : <48} {col_1_2 : <20} | {col_2 : <31} | Prediction: {col_4_1 : <15} {col_4_2 : <18} | {col_5}")
+
             desired_replicas = max(desired_replicas_cpu, desired_replicas_memory)
             desired_replicas = max(desired_replicas, self.containers[container].get("min_replicas"))
             desired_replicas = min(desired_replicas, self.containers[container].get("max_replicas"))
 
             if current_replicas[container] != desired_replicas:
-                print("=> Scaling", container, "from", current_replicas[container], "to", desired_replicas)
+                if current_replicas[container] < desired_replicas:
+                    print(f"{Color.GREEN}=> Upcaling {container} from {current_replicas[container]} to {desired_replicas} {Color.END}")
+                elif current_replicas[container] > desired_replicas:
+                    print(f"{Color.RED}=> Downscaling {container} from {current_replicas[container]} to {desired_replicas} {Color.END}")
                 self.__scale_a_container(container, desired_replicas)
             else:
                 pass
-                # print("Skipping", container)
         
+        print("-" * 175)
 
 
     def __scale_a_container(self, container_name: str, desired_replicas: int):
@@ -72,7 +79,7 @@ class Scaler:
         try:
             api_response = self.api_instance.patch_namespaced_deployment(container_name, self.namespace, body, pretty=pretty)
         except ApiException as e:
-            print("Exception when calling AppsV1Api->patch_namespaced_deployment: %s\n" % e)
+            logger.error("Exception when calling AppsV1Api->patch_namespaced_deployment: %s\n" % e)
 
     def close(self):
         self.db.close()

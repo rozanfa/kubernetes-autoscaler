@@ -3,6 +3,9 @@ from src.classes.DB import DB
 import pandas as pd
 import numpy as np
 
+import logging
+logger = logging.getLogger(__name__)
+
 class Predictor:
     def __init__(self, model, scaler, db: DB):
         config = ConfigManager.get_config()
@@ -16,11 +19,10 @@ class Predictor:
 
     def predict(self, timestamp: int) -> pd.DataFrame | None:
         data, colnames = self.db.get_data(limit=self.n_steps)
-        # print("Data:", data)
-        print("Data length:", len(data))
+        logger.debug("Data length:", len(data))
 
         if len(data) < self.n_steps:
-            print("Not enough data to predict")
+            logger.info("Skipping due to not enough data to predict")
             return None
         
         data = pd.DataFrame(data, columns=colnames).astype(float).drop(["id", "timestamp"], axis=1)
